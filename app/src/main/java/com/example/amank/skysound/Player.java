@@ -42,7 +42,7 @@ public class Player {
             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {
-                    MainActivity.flipPlayPauseButton(false);
+                    //SkySoundSongs.flipPlayPauseButton(false);
                 }
             });
             mediaPlayer.prepareAsync();
@@ -54,7 +54,7 @@ public class Player {
     public void pausePlayer(){
         try{
             mediaPlayer.pause();
-            MainActivity.flipPlayPauseButton(false);
+            //SkySoundSongs.flipPlayPauseButton(false);
 
         }catch (Exception e){
             Log.d("EXCEPTION ","Failed to pause the media player");
@@ -64,7 +64,7 @@ public class Player {
     public void playPlayer(){
         try{
             mediaPlayer.start();
-            MainActivity.flipPlayPauseButton(true);
+            //SkySoundSongs.flipPlayPauseButton(true);
 
         }catch (Exception e){
             Log.d("EXCEPTION ","Failed to Start the media player");
