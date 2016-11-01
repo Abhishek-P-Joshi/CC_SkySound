@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">SkySound</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_sky_sound_songs">SkySoundSongs</string>
+    <string name="title_activity_uploaded_songs">UploadedSongs</string>
+    <string name="title_activity_sky_sound_songs1">SkySoundSongs1</string>
 </resources>
