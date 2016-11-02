@@ -103,7 +103,7 @@ public class SkySoundSongs extends AppCompatActivity {
     public static AudioWidget sendAudioWidget(){
         return audioWidget;
     }
-
+//-----------------------------------------Checking for permissions to float the widget-------------------------------------------
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -119,6 +119,8 @@ public class SkySoundSongs extends AppCompatActivity {
         Toast.makeText(this, "Permission Not granted", Toast.LENGTH_SHORT).show();
         finish();
     }
+
+    //--------------------------------------------------------------------------------------------------------------------------
 
     private void startStreamingService(String url,String songtitle){
 
@@ -181,6 +183,7 @@ public class SkySoundSongs extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    //----------------------------------------------------Fetching the songs from the web-----------------------------------------
     private void fetchSongsFromWeb(){
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -244,6 +247,8 @@ public class SkySoundSongs extends AppCompatActivity {
         populateSongsListView();
     }
 
+
+    //--------------------------------------------Populating the List View in the app-------------------------------------------
     private void populateSongsListView(){
         runOnUiThread(new Runnable() {
             @Override
@@ -265,6 +270,7 @@ public class SkySoundSongs extends AppCompatActivity {
         });
     }
 
+    //-----------------------------------------------Counting the number of plays of a song---------------------------------------
     private void markSongPlayed(final int chosenId){
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -296,6 +302,7 @@ public class SkySoundSongs extends AppCompatActivity {
 
     }
 
+    //-----------------------------------------Adding a dialog box to like a song-----------------------------------------------
     private void askForLikes(final Song song){
         new AlertDialog.Builder(this)
                 .setTitle(song.getTitle())
@@ -317,6 +324,7 @@ public class SkySoundSongs extends AppCompatActivity {
 
     }
 
+    //------------------------------------------------------Counting the number of Likes of a song--------------------------------
     private void likeSong(final int chosenId){
         Thread thread = new Thread(new Runnable() {
             @Override

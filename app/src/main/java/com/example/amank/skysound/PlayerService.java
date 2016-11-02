@@ -66,7 +66,7 @@ public class PlayerService extends Service {
             stopForeground(true);
             stopSelf();
         }
-
+//-------------------------------------Creating a floating audio widget--------------------------------------------------------
         AudioWidget audioWidget = SkySoundSongs.sendAudioWidget();
 
         audioWidget.controller().onControlsClickListener(new AudioWidget.OnControlsClickListener() {
@@ -114,7 +114,7 @@ public class PlayerService extends Service {
         return START_STICKY;
     }
 
-//-----------------------------------------------
+//-----------------------------------------------Displaying the notification bar-------------------------------------------------
     private void showNotification(String songtitle){
         Intent notificationIntent = new Intent(this, MainActivity.class);
         notificationIntent.setAction(Constants.ACTION.MAIN_ACTION);
@@ -155,7 +155,7 @@ public class PlayerService extends Service {
         startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE,notification);
 
     }
-
+//--------------------------------------------------------------------------------------------------------------------------------
     @Override
     public IBinder onBind(Intent intent) {
         return mBinder;
