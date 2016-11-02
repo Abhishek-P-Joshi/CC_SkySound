@@ -26,6 +26,7 @@ public class PlayerService extends Service {
 
     MediaPlayer mediaPlayer = new MediaPlayer();
     private final IBinder mBinder = new MyBinder();
+    private String songtitle;
 
     public class MyBinder extends Binder{
         PlayerService getService(){
@@ -42,9 +43,13 @@ public class PlayerService extends Service {
         if(intent.getStringExtra("url")!=null)
             playStream(intent.getStringExtra("url"));
 
+        if(intent.getStringExtra("Song_Title")!=null)
+            songtitle = intent.getStringExtra("Song_Title");
+
+
         if(intent.getAction().equals(Constants.ACTION.STARTFOREGROUND_ACTION)){
             Log.i("INFO", "Start foreground Service");
-            showNotification();
+            showNotification(songtitle);
         }
         else if(intent.getAction().equals(Constants.ACTION.PREV_ACTION)){
             Log.i("INFO", "Prev Pressed");
@@ -110,7 +115,7 @@ public class PlayerService extends Service {
     }
 
 //-----------------------------------------------
-    private void showNotification(){
+    private void showNotification(String songtitle){
         Intent notificationIntent = new Intent(this, MainActivity.class);
         notificationIntent.setAction(Constants.ACTION.MAIN_ACTION);
         //notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -137,7 +142,7 @@ public class PlayerService extends Service {
         Notification notification = new NotificationCompat.Builder(this)
                 .setContentTitle("SkySound")
                 .setTicker("Playing Music")
-                .setContentText("My song")
+                .setContentText(songtitle)
                 .setSmallIcon(R.drawable.skysound)
                 .setLargeIcon(Bitmap.createScaledBitmap(icon,128,128,false))
                 .setContentIntent(pendingIntent)
@@ -192,7 +197,7 @@ public class PlayerService extends Service {
         try{
             mediaPlayer.pause();
             flipPlayPauseButton(false);
-            showNotification();
+            showNotification(songtitle);
             unregisterReceiver(noisyAudioStreamReceiver);
 
         }catch (Exception e){
@@ -204,7 +209,7 @@ public class PlayerService extends Service {
         try{
             getAudioFocusAndPlay();
             flipPlayPauseButton(true);
-            showNotification();
+            showNotification(songtitle);
 
         }catch (Exception e){
             Log.d("EXCEPTION ","Failed to Start the media player");
