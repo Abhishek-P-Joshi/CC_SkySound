@@ -120,10 +120,11 @@ public class SkySoundSongs extends AppCompatActivity {
         finish();
     }
 
-    private void startStreamingService(String url){
+    private void startStreamingService(String url,String songtitle){
 
         Intent i = new Intent(this,PlayerService.class);
         i.putExtra("url",url);
+        i.putExtra("Song_Title",songtitle);
         i.setAction(Constants.ACTION.STARTFOREGROUND_ACTION);
         startService(i);
         bindService(i,mServiceConnection,Context.BIND_AUTO_CREATE);
@@ -254,7 +255,7 @@ public class SkySoundSongs extends AppCompatActivity {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         Song song = songs.get(position);
                         String songAddress = "http://79.170.40.180/cloudatlas.com/Music_files/"+song.getTitle();
-                        startStreamingService(songAddress);
+                        startStreamingService(songAddress,song.getTitle());
                         markSongPlayed(song.getId());
                         askForLikes(song);
 
