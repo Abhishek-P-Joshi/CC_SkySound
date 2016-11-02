@@ -13,9 +13,12 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
+import com.cleveroad.audiowidget.AudioWidget;
 
 import java.io.IOException;
 
@@ -59,9 +62,54 @@ public class PlayerService extends Service {
             stopSelf();
         }
 
+        AudioWidget audioWidget = SkySoundSongs.sendAudioWidget();
+
+        audioWidget.controller().onControlsClickListener(new AudioWidget.OnControlsClickListener() {
+            @Override
+            public boolean onPlaylistClicked() {
+                return false;
+            }
+
+            @Override
+            public void onPreviousClicked() {
+
+            }
+
+            @Override
+            public boolean onPlayPauseClicked() {
+                togglePlayer();
+                return true;
+            }
+
+            @Override
+            public void onNextClicked() {
+
+            }
+
+            @Override
+            public void onAlbumClicked() {
+
+            }
+        });
+
+        audioWidget.controller().onWidgetStateChangedListener(new AudioWidget.OnWidgetStateChangedListener() {
+            @Override
+            public void onWidgetStateChanged(@NonNull AudioWidget.State state) {
+
+            }
+
+            @Override
+            public void onWidgetPositionChanged(int cx, int cy) {
+
+            }
+        });
+
+        audioWidget.show(100,100);
+
         return START_STICKY;
     }
 
+//-----------------------------------------------
     private void showNotification(){
         Intent notificationIntent = new Intent(this, MainActivity.class);
         notificationIntent.setAction(Constants.ACTION.MAIN_ACTION);
@@ -108,6 +156,7 @@ public class PlayerService extends Service {
         return mBinder;
     }
 
+    //------------------------------------------------Music Player Streaming Functions-----------------------------------------------
     public void playStream(String url){
         if(mediaPlayer != null){
             try{
@@ -180,7 +229,8 @@ public class PlayerService extends Service {
         }
     }
 
-    //Audio Focus
+    //-------------------------------------------Requesting or Relinquishing Audio Focus---------------------------------------
+
     private AudioManager am;
     private boolean playingBeforeInterruption = false;
 
@@ -216,8 +266,7 @@ public class PlayerService extends Service {
         }
     };
 
-
-    //Audio Rerouted(Earphone handling)
+    //------------------------------------------Audio Rerouted(Earphone Interruption handling)---------------------------------
     private class NoisyAudioStreamReceiver extends BroadcastReceiver{
         @Override
         public void onReceive(Context context, Intent intent) {

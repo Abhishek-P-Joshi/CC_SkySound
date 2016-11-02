@@ -7,8 +7,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
@@ -20,6 +23,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import com.cleveroad.audiowidget.AudioWidget;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -38,6 +44,10 @@ public class SkySoundSongs extends AppCompatActivity {
     boolean mServiceBound = false;
     List<Song> songs = new ArrayList<>();
     ListView songsListView;
+
+    public static AudioWidget audioWidget;
+    private static final int OVERLAY_PERMISSION_REQ_CODE = 1;
+
 
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
@@ -68,6 +78,11 @@ public class SkySoundSongs extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
+            startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);
+        }
+
         playPauseButton = (FloatingActionButton) findViewById(R.id.playpause1);
         playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,6 +96,28 @@ public class SkySoundSongs extends AppCompatActivity {
         String url = "http://79.170.40.180/cloudatlas.com/Music_files/bensound-cute.mp3";
         songsListView = (ListView) findViewById(R.id.SongsListView);
         fetchSongsFromWeb();
+
+        audioWidget = new AudioWidget.Builder(this).build();
+    }
+
+    public static AudioWidget sendAudioWidget(){
+        return audioWidget;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == OVERLAY_PERMISSION_REQ_CODE) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(SkySoundSongs.this)) {
+                onPermissionsNotGranted();
+            }
+
+        }
+    }
+
+    private void onPermissionsNotGranted() {
+        Toast.makeText(this, "Permission Not granted", Toast.LENGTH_SHORT).show();
+        finish();
     }
 
     private void startStreamingService(String url){
