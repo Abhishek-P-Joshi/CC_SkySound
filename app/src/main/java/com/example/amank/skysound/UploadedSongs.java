@@ -129,6 +129,7 @@ public class UploadedSongs extends AppCompatActivity {
         Intent i = new Intent(this,PlayerService.class);
         i.putExtra("url",url);
         i.putExtra("Song_Title",songtitle);
+        i.putExtra("UploadedSongs","UploadedSongs");
         i.setAction(Constants.ACTION.STARTFOREGROUND_ACTION);
         startService(i);
         bindService(i,mServiceConnection,Context.BIND_AUTO_CREATE);
@@ -233,12 +234,12 @@ public class UploadedSongs extends AppCompatActivity {
     }
 
     private void parseIntoSongs (String data, String androidId){
-        String[] dataArray = data.split("\\*");
+        String[] dataArray = data.split(",,,");
         int i=0;
 
         for(i=0; i<dataArray.length;i++){
             String[] songArray = dataArray[i].split(",");
-            Song song = new Song(songArray[0],songArray[1],songArray[2],songArray[3]);
+            Song song = new Song(null,songArray[0],"0","0");
             songs.add(song);
         }
 
@@ -351,5 +352,5 @@ public class UploadedSongs extends AppCompatActivity {
         thread.start();
 
     }
-    
+
 }
