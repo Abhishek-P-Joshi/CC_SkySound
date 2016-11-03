@@ -1,0 +1,14 @@
+Our project runs on Android Studio and downloading and installing the standard source code runs the application.
+
+We have a number of PHP's on server side to perform operations on the tables in the database
+
+Filename                Purpose
+upload.php              upload the songs to the server
+createfolders.php       create individual folders based on android unique ID's and also create individual table entries
+getUploadedSongs.php    provide a list of uploaded songs
+populateUserSongs.php   populate the table entries in the database
+addlike.php             adding the likes in the database
+addplay.php             incrementing the number of plays in the database
+getmusic.php            getting the list of songs from the database
+listmusic.php           list the songs and insert into the database
+
