@@ -5,12 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -19,9 +18,14 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -36,7 +40,8 @@ public class UploadYourSong extends AppCompatActivity {
     private Uri audioFileUri;
     private String audioFilePath;
 
-    String upLoadServerUri = "http://79.170.40.180/cloudatlas.com/upload.php";
+    public String androidId;
+
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
@@ -67,6 +72,8 @@ public class UploadYourSong extends AppCompatActivity {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
+        androidId = android.provider.Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+
         ChooseFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -80,18 +87,59 @@ public class UploadYourSong extends AppCompatActivity {
         Upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(audioFileUri!=null)
-                    UploadFile("/sdcard/Download/01 - Ghar Se Nikalte Hi-(MyMp3Singer.com).mp3");
+                if(audioFileUri!=null) {
+                    //UploadFile("/sdcard/Download/bensound-cute.mp3");
+                    createFolderAndTable(androidId);
+                    UploadFile(audioFilePath,androidId);
+                }
                 else
                     Toast.makeText(getApplicationContext(),"Please select a file",Toast.LENGTH_LONG).show();
             }
         });
 
-        //bitmap = MediaStore.Audio.Media.getContentUriForPath()
+    }
 
+    public void createFolderAndTable (final String androidId){
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                InputStream inputStream = null;
+                HttpURLConnection urlConnection = null;
+                try{
+                    URL url = new URL("http://79.170.40.180/cloudatlas.com/uploads/createfolders.php?id="+ androidId);
+                    urlConnection = (HttpURLConnection)url.openConnection();
+                    urlConnection.setRequestMethod("GET");
 
+                    int statuscode = urlConnection.getResponseCode();
+                    if(statuscode == 200){
+                        inputStream = new BufferedInputStream(urlConnection.getInputStream());
+                        String response = convertInputStreamToString(inputStream);
+                        Log.i("Created Folder/Table",response);
+                    }
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+                finally{
+                    if(urlConnection !=null)
+                        urlConnection.disconnect();
+                }
+            }
+        });
+        thread.start();
+    }
+    private String convertInputStreamToString(InputStream inputStream) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
+        String line = "";
+        String result = "";
 
+        while((line = bufferedReader.readLine()) != null){
+            result += line;
+        }
+        if(inputStream != null){
+            inputStream.close();
+        }
+        return result;
     }
 
     @Override
@@ -101,10 +149,10 @@ public class UploadYourSong extends AppCompatActivity {
         if(requestCode == PICK_SONG_REQUEST && resultCode == RESULT_OK && data !=null && data.getData() != null){
             audioFileUri = data.getData();
             //File audioFile = new File(audioFileUri.getPath());
-            //audioFilePath = audioFileUri.getPath();
-            Bitmap bitmap = BitmapFactory.decodeFile(audioFileUri.toString());
-            imageView.setImageBitmap(bitmap);
-            audioFilePath = getRealPathFromURI(getApplicationContext(),audioFileUri);
+            audioFilePath = audioFileUri.getPath();
+            //Bitmap bitmap = BitmapFactory.decodeFile(audioFileUri.toString());
+            //imageView.setImageBitmap(bitmap);
+            //audioFilePath = getRealPathFromURI(getApplicationContext(),audioFileUri);
             Toast.makeText(getApplicationContext(), audioFilePath,Toast.LENGTH_LONG).show();
         }
     }
@@ -149,9 +197,14 @@ public class UploadYourSong extends AppCompatActivity {
 
     //}
 
-    public int UploadFile(String sourceFileUri) {
+    public int UploadFile(String sourceFileUri, String androidId) {
 
         String fileName = sourceFileUri;
+        String[] bits = fileName.split("/");
+        String lastOne = bits[bits.length-1];
+
+        String upLoadServerUri = "http://79.170.40.180/cloudatlas.com/upload.php";
+        upLoadServerUri = upLoadServerUri + "?id=" + androidId;
 
         HttpURLConnection conn = null;
         DataOutputStream dos = null;
@@ -242,7 +295,10 @@ public class UploadYourSong extends AppCompatActivity {
                                     .show();
                         }
                     });
+
+                    populateUserSongs(androidId,lastOne);
                 }
+
 
                 // close the streams //
                 fileInputStream.close();
@@ -283,6 +339,30 @@ public class UploadYourSong extends AppCompatActivity {
             //dialog.dismiss();
             return serverResponseCode;
         }
+    }
+
+    private void populateUserSongs (final String androidId , final String lastone){
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                InputStream inputStream = null;
+                HttpURLConnection urlConnection = null;
+
+                try{
+                    URL url = new URL("http://79.170.40.180/cloudatlas.com/uploads/populateUserSongs.php?id="+ androidId + "&id2=" + lastone);
+                    urlConnection = (HttpURLConnection)url.openConnection();
+                    urlConnection.setRequestMethod("GET");
+                    urlConnection.getResponseCode();
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+                finally{
+                    if(urlConnection !=null)
+                        urlConnection.disconnect();
+                }
+            }
+        });
+        thread.start();
     }
 
 
