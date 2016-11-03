@@ -264,9 +264,6 @@ public class UploadedSongs extends AppCompatActivity {
                         Song song = songs.get(position);
                         String songAddress = "http://79.170.40.180/cloudatlas.com/uploads/"+androidId+"/"+song.getTitle();
                         startStreamingService(songAddress,song.getTitle());
-                        markSongPlayed(song.getId());
-                        askForLikes(song);
-
                     }
                 });
             }
