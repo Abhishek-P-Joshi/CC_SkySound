@@ -27,6 +27,7 @@ public class PlayerService extends Service {
     MediaPlayer mediaPlayer = new MediaPlayer();
     private final IBinder mBinder = new MyBinder();
     private String songtitle;
+    public AudioWidget audioWidget;
 
     public class MyBinder extends Binder{
         PlayerService getService(){
@@ -67,7 +68,10 @@ public class PlayerService extends Service {
             stopSelf();
         }
 //-------------------------------------Creating a floating audio widget--------------------------------------------------------
-        AudioWidget audioWidget = SkySoundSongs.sendAudioWidget();
+        if(intent.getStringExtra("SkySoundSongs")=="SkySoundSongs")
+            audioWidget = SkySoundSongs.sendAudioWidget();
+        else
+            audioWidget = UploadedSongs.sendAudioWidget();
 
         audioWidget.controller().onControlsClickListener(new AudioWidget.OnControlsClickListener() {
             @Override

@@ -1,7 +1,8 @@
 package com.example.amank.skysound;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -103,7 +104,13 @@ public class MusicEvents extends AppCompatActivity {
             public void run() {
                 EventListAdapter adapter = new EventListAdapter(MusicEvents.this, eventsList);
                 eventListView.setAdapter(adapter);
-
+                eventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        Events events = eventsList.get(position);
+                        new AlertDialog.Builder(MusicEvents.this).setTitle(events.getEventName()).setMessage(events.getDate() + "\n " + "Genre : " +events.getGenre() + " \n Place : " + events.getLocation()).show();
+                    }
+                });
             }
         });
     }
