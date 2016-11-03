@@ -68,7 +68,7 @@ public class PlayerService extends Service {
             stopSelf();
         }
 //-------------------------------------Creating a floating audio widget--------------------------------------------------------
-        if(intent.getStringExtra("SkySoundSongs")=="SkySoundSongs")
+        if(intent.getStringExtra("SkySoundSongsIntent")!= null)
             audioWidget = SkySoundSongs.sendAudioWidget();
         else
             audioWidget = UploadedSongs.sendAudioWidget();
